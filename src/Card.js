@@ -1,6 +1,9 @@
 import React from "react";
 import minus from "./minus.png";
 import plus from "./plus.png";
+import darkPlus from "./darkPlus.png";
+import darkMinus from "./darkMinus.png";
+import { ThemeContext } from "./ThemeContext";
 
 
 class Card extends React.Component{
@@ -78,10 +81,14 @@ class Card extends React.Component{
     modifyStyle=()=>{
         this.props.deleteCounter(this.props.id);
     }
+    static contextType = ThemeContext;
+
     render(){
+        const {darkorlight} = this.context;
+        console.log(darkorlight);
         return(
-            <div className="counters card br2 ba dark-gray b--black-10 mv4 w-100 w-50-m w-25-l mw5 ml4 pt2 pb3 ph2">
-                <div className="ma0 jusrify-between center">{this.state.title}</div>
+            <div className={`counters card br2 ba dark-gray mv4 w-100 w-50-m w-25-l mw5 ml4 pt2 pb3 ph2 ${darkorlight === 'Light'? 'b--white-20' : 'b--black-20'}`}>
+                <div className={`ma0 center ${darkorlight === 'Light'? 'white' : 'black'}`}>{this.state.title}</div>
                 {/* <div className="flex mt2 justify-between ph3 center"> */}
                     <div className="flex flex-row justify-between mt2">
                         <input className="w4 mt2 h1 pv1" onChange={this.getTitle} onKeyDown={this.getTitle} maxLength={20}></input>
@@ -93,12 +100,12 @@ class Card extends React.Component{
                         <input className="w4 h1 ml1 mb1 pv2" type="number" onChange={this.getGoal} onKeyDown={this.getGoal} min={0} max={10000}/>
                         <button className="w4 ml1" onClick={this.setGoal}>Set Goal</button>
                     </div>
-                    <div className="w4">{this.state.goal}</div>
+                    <div className={`w4 ${darkorlight === 'Light'? 'white' : 'black'}`}>{this.state.goal}</div>
                 </div>
                 <div className="flex justify-center mv2">
-                    <div onClick={this.subtract}><img src={minus} alt="-"/></div>
-                    <div className="mv1 mh2">{this.state.reps}</div>
-                    <div onClick={this.add}><img src={plus} alt="+"/></div>
+                    <div onClick={this.subtract}><img src={darkorlight === 'Light'? darkMinus : minus} alt="-"/></div>
+                    <div className={`mv1 mh2 ${darkorlight === 'Light'? 'white' : 'black'}`}>{this.state.reps}</div>
+                    <div onClick={this.add}><img src={darkorlight === 'Light'? darkPlus : plus} alt="+"/></div>
                 </div>
                 <button className="mh2" onClick={this.reset}>Reset</button>
                 <button onClick={this.modifyStyle}>Delete Counter</button>
