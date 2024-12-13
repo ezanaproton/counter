@@ -7,16 +7,27 @@ import { ThemeContext } from "./ThemeContext";
 
 
 class Card extends React.Component{
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             titleInput: "",
             title: "New Card",
             goalInput: 0,
             goal: 1,
             reps: 0,
-            success: ""
+            success: "",
+            addintervalId: null,
+            subtractintervalId: null
         };
+        this.add = this.add.bind(this);
+        this.subtract = this.subtract.bind(this);
+        this.reset = this.reset.bind(this);
+        this.getGoal = this.getGoal.bind(this);
+        this.setGoal = this.setGoal.bind(this);
+        this.addMouseDown = this.addMouseDown.bind(this);
+        this.addMouseUp = this.addMouseUp.bind(this);
+        this.subtractMouseDown = this.subtractMouseDown.bind(this);
+        this.subtractMouseUp = this.subtractMouseUp.bind(this);
     };
 
     successCheck=(input, goal=this.state.goal)=>{
@@ -50,8 +61,9 @@ class Card extends React.Component{
     }
 
     getGoal=(event)=>{
+        if(event.target.value>10000){return;}
         if(event.key === 'Enter'){
-            this.setState({goal: event.target.value});
+            this.setGoal();
         }else{
             this.setState({goalInput: event.target.value});
         }
@@ -83,12 +95,34 @@ class Card extends React.Component{
     }
     static contextType = ThemeContext;
 
+    addMouseDown = () =>{
+        const addintervalId = setInterval(this.add, 75); // Adjust the interval time as needed
+        this.setState({ addintervalId: addintervalId }); // Corrected the typo here
+    }
+
+    addMouseUp = () => {
+        if(this.state.addintervalId){
+            clearInterval(this.state.addintervalId);
+            this.setState({ addintervalId: null });
+        }
+        // console.log("working");
+    }
+    subtractMouseDown = () =>{
+        const subtractintervalId = setInterval(this.subtract, 75); // Adjust the interval time as needed
+        this.setState({ subtractintervalId }); // Corrected the typo here
+    }
+
+    subtractMouseUp = () => {
+        clearInterval(this.state.subtractintervalId);
+        this.setState({ subtractintervalId: null });
+    }
+
     render(){
         const {darkorlight} = this.context;
-        console.log(darkorlight);
+        // console.log(darkorlight);
         return(
-            <div className={`counters card br2 ba dark-gray mv4 w-100 w-50-m w-25-l mw5 ml4 pt2 pb3 ph2 ${darkorlight === 'Light'? 'b--white-20' : 'b--black-20'}`}>
-                <div className={`ma0 center ${darkorlight === 'Light'? 'white' : 'black'}`}>{this.state.title}</div>
+            <div className={`counters card br2 ba dark-gray mv4 w-100 w-50-m w-25-l mw5 ml4 pt2 pb3 ph2 ${darkorlight === 'Dark'? 'b--white-20' : 'b--black-20'}`}>
+                <div className={`ma0 center ${darkorlight === 'Dark'? 'white' : 'black'}`}>{this.state.title}</div>
                 {/* <div className="flex mt2 justify-between ph3 center"> */}
                     <div className="flex flex-row justify-between mt2">
                         <input className="w4 mt2 h1 pv1" onChange={this.getTitle} onKeyDown={this.getTitle} maxLength={20}></input>
@@ -100,12 +134,16 @@ class Card extends React.Component{
                         <input className="w4 h1 ml1 mb1 pv2" type="number" onChange={this.getGoal} onKeyDown={this.getGoal} min={0} max={10000}/>
                         <button className="w4 ml1" onClick={this.setGoal}>Set Goal</button>
                     </div>
-                    <div className={`w4 ${darkorlight === 'Light'? 'white' : 'black'}`}>{this.state.goal}</div>
+                    <div className={`w4 ${darkorlight === 'Dark'? 'white' : 'black'}`}>{this.state.goal}</div>
                 </div>
                 <div className="flex justify-center mv2">
-                    <div onClick={this.subtract}><img src={darkorlight === 'Light'? darkMinus : minus} alt="-"/></div>
-                    <div className={`mv1 mh2 ${darkorlight === 'Light'? 'white' : 'black'}`}>{this.state.reps}</div>
-                    <div onClick={this.add}><img src={darkorlight === 'Light'? darkPlus : plus} alt="+"/></div>
+                    <div id='minus' onClick={this.subtract} onMouseDown={this.subtractMouseDown} onMouseUp={this.subtractMouseUp} onMouseLeave={this.subtractMouseUp}>
+                        <img src={darkorlight === 'Dark' ? darkMinus : minus} alt="-" />
+                    </div>
+                    <div className={`mv1 mh2 ${darkorlight === 'Dark' ? 'white' : 'black'}`}>{this.state.reps}</div>
+                    <div id='plus' onClick={this.add} onMouseDown={this.addMouseDown} onMouseUp={this.addMouseUp} onMouseLeave={this.addMouseUp}>
+                        <img src={darkorlight === 'Dark' ? darkPlus : plus} alt="+" />
+                    </div>
                 </div>
                 <button className="mh2" onClick={this.reset}>Reset</button>
                 <button onClick={this.modifyStyle}>Delete Counter</button>
